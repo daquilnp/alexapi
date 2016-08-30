@@ -1,0 +1,13 @@
+HelloWorldIntent say hello
+HelloWorldIntent hello
+LogWorkoutIntent log {weight}
+LogWorkoutIntent log {weight}
+CardioIntent  {end | cardiocommand} cardio
+CardioIntent  {start | cardiocommand} cardio
+SetMoodWeatherIntent set the mood
+SetMoodWeatherIntent play the weather
+WorkoutMusicIntent plat workout music
+DoorLockedIntent is my door locked
+QuickStatsIntent {sleep | stats} information
+QuickStatsIntent {workout | stats} information
+QuickStatsIntent {quick | stats} information
