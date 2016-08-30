@@ -1,0 +1,26 @@
+{
+  "intents": [
+    {"intent": "HelloWorldIntent"},
+    {"intent": "LogWorkoutIntent",
+     "slots":[
+       {"name": "weight",
+        "type": "AMAZON.NUMBER"}
+     ]
+    },
+     {"intent": "CardioIntent",
+     "slots":[
+       {"name": "cardiocommand",
+        "type": "AMAZON.LITERAL"}
+     ]
+    },
+    {"intent": "SetMoodWeatherIntent"},
+    {"intent": "WorkoutMusicIntent"},
+    {"intent": "DoorLockedIntent"},
+    {"intent": "QuickStatsIntent",
+     "slots":[
+       {"name": "stats",
+        "type": "AMAZON.LITERAL"}
+     ]}
+    
+  ]
+}
