@@ -117,23 +117,33 @@ def handle_session_end_request():
 
 def get_conversion(intent, session):
 
-    unit = ["feet", "meters"]
+    accepted_units = ["feet", "meters"]
     card_title = intent['name']
     session_attributes = {}
     should_end_session = False
-    
+    if 'to_unit' in intent['slots'] and 'from_unit' in intent['slots'] and 'measurement' in intent['slots']:
+        if 'value' in intent['slots']['measurement'] and 'value' in intent['slots']['to_unit'] and 'value' in intent['slots']['from_unit']:
 
+            measurement = intent['slots']['measurement']['value']
 
-    
-    if 'measurement' in intent['slots']:
-        measurement = intent['slots']['measurement']['value']
-        if intent['slots']['from_unit']['value'] == "meters":
-            conversion = float(measurement)*3.28084
+            if intent['slots']['from_unit']['value'] not in accepted_units or intent['slots']['to_unit']['value'] not in accepted_units:
+                speech_output = "the unit specified is not accepted, please use feet or meters"
+                reprompt_text = "I'm not sure what your unit was. " \
+                            "Please try again."
+                return build_response(session_attributes, build_speechlet_response(
+            card_title, speech_output, reprompt_text, should_end_session))
+
+            if intent['slots']['from_unit']['value'] == "meters":
+                conversion = float(measurement)*3.28084
+            else:
+                conversion = 0.3048*float(measurement)
+            speech_output = measurement + " " + intent['slots']['from_unit']['value'] + " is " + str(conversion) + " " +  intent['slots']['to_unit']['value']
+                            
+            reprompt_text = "Ask me another converstion"
+            
         else:
-            conversion = 0.3048*float(measurement)
-        speech_output = measurement + " " + intent['slots']['from_unit']['value'] + " is " + str(conversion) + " " +  intent['slots']['to_unit']['value']
-                        
-        reprompt_text = "Ask me another converstion"
+            speech_output = "Your command is incomplete. Please try again or ask for help."
+            reprompt_text = "Your command is incomplete. Please try again or ask for help."
     else:
         speech_output = "I'm not sure what your conversion was. " \
                         "Please try again."
@@ -152,7 +162,13 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
             'type': 'PlainText',
             'text': output
         },
-        'shouldEndSession': True
+        'reprompt': {
+            'outputSpeech': {
+                'type': 'PlainText',
+                'text': reprompt_text
+            }
+        },
+        'shouldEndSession': should_end_session
     }
 
 
