@@ -1,12 +1,3 @@
-"""
-This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
-The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well
-as testing instructions are located at http://amzn.to/1LzFrj6
-
-For additional samples, visit the Alexa Skills Kit Getting Started guide at
-http://amzn.to/1LGWsLG
-"""
-
 from __future__ import print_function
 
 def lambda_handler(event, context):
@@ -65,8 +56,10 @@ def on_intent(intent_request, session):
     intent_name = intent_request['intent']['name']
 
     # Dispatch to your skill's intent handlers
-    if intent_name == "FeetToMeterIntent":
-        return get_conversion(intent, session)
+    if intent_name == "GradePercentageIntent":
+        return get_percentage_grade(intent, session)
+    if intent_name == "GradePassIntent":
+        return get_pass_grade(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
@@ -94,12 +87,15 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Welcome"
-    speech_output = "Welcome to Convert Quick. " \
-                    "You can convert feet to meters and meters to feet. " \
-                    "Just say convert 3 feet to meters, or convert 10 meters to feet"
+    speech_output = "Welcome to Exam Grade Estimator. " \
+                    "Here you can determine how much you need to get in the exam to get your target mark " \
+                    "in the course. Just ask, I am going into the exam with a 78 percent, what do I need on the 40 percent exam " \
+                    "to get 82 percent in the course. Or, if you are the watch movies through exam type, just ask, " \
+                    "I am going into the exam with a 65 percent, what do I need in order to pass the course"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Ask me a feet to meters conversion"
+    reprompt_text = "Tell me the mark you want in the course " \
+    "and  I will guess the grade you need on your exam based on the grade you have going into it."
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -107,52 +103,93 @@ def get_welcome_response():
 
 def handle_session_end_request():
     card_title = "Session Ended"
-    speech_output = "Thank you for using the convert quick skill. " \
-                    "Have a nice day! "
+    speech_output = "Thank you for using the exam grade estimator. " \
+                    "Good luck on your exams! "
     # Setting this to true ends the session and exits the skill.
     should_end_session = True
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
 
-def get_conversion(intent, session):
+def get_percentage_grade(intent, session):
 
-    accepted_units = ["feet", "meters"]
     card_title = intent['name']
     session_attributes = {}
     should_end_session = True
-    if 'to_unit' in intent['slots'] and 'from_unit' in intent['slots'] and 'measurement' in intent['slots']:
-        if 'value' in intent['slots']['measurement'] and 'value' in intent['slots']['to_unit'] and 'value' in intent['slots']['from_unit']:
 
-            measurement = intent['slots']['measurement']['value']
+    if 'current_grade' in intent['slots'] and 'exam_percentage' in intent['slots'] and 'desired_grade' in intent['slots']:
+        if 'value' in intent['slots']['current_grade'] and 'value' in intent['slots']['exam_percentage'] and 'value' in intent['slots']['desired_grade']:
 
-            if intent['slots']['from_unit']['value'] not in accepted_units or intent['slots']['to_unit']['value'] not in accepted_units:
-                speech_output = "the unit specified is not accepted, please use feet or meters"
-                reprompt_text = "I'm not sure what your unit was. " \
-                            "Please try again."
-                return build_response(session_attributes, build_speechlet_response(
-            card_title, speech_output, reprompt_text, should_end_session))
+            current_grade = int(intent['slots']['current_grade']['value'])
+            exam_percentage = int(intent['slots']['exam_percentage']['value'])
+            desired_grade = int(intent['slots']['desired_grade']['value'])
 
-            if intent['slots']['from_unit']['value'] == "meters":
-                conversion = float(measurement)*3.28084
-            else:
-                conversion = 0.3048*float(measurement)
-            speech_output = measurement + " " + intent['slots']['from_unit']['value'] + " is " + str(conversion) + " " +  intent['slots']['to_unit']['value']
+
+            so_far_grade = float(current_grade)*(1 - exam_percentage/100.0)
+            needed_exam_grade = float((desired_grade - so_far_grade))/exam_percentage
+            percent_needed = str(needed_exam_grade*100)
+            if (needed_exam_grade < 0):
+                percent_needed = "literally below 0"
+
+
+            speech_output = "In order to get " + str(desired_grade) + " percent in the course, " \
+            "you need to get " + percent_needed + " percent on the exam." 
+
                             
-            reprompt_text = "Ask me another converstion"
-            
+            reprompt_text = "Tell me the mark you want in the course " \
+            "and  I will guess the grade you need on your exam based on the grade you have going into it."
+
+
         else:
             speech_output = "Your command is incomplete. Please try again or ask for help."
             reprompt_text = "Your command is incomplete. Please try again or ask for help."
     else:
-        speech_output = "I'm not sure what your conversion was. " \
+        speech_output = "I'm not sure what your question was. " \
                         "Please try again."
-        reprompt_text = "I'm not sure what your conversion was. " \
+        reprompt_text = "I'm not sure what your question was. " \
                         "Please try again."
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+def get_pass_grade(intent, session):
 
+    card_title = intent['name']
+    session_attributes = {}
+    should_end_session = True
+
+    if 'current_grade' in intent['slots'] and 'exam_percentage' in intent['slots']:
+        if 'value' in intent['slots']['current_grade'] and 'value' in intent['slots']['exam_percentage']:
+
+            current_grade = int(intent['slots']['current_grade']['value'])
+            exam_percentage = int(intent['slots']['exam_percentage']['value'])
+            desired_grade = 50
+
+
+            so_far_grade = float(current_grade)*(1 - exam_percentage/100.0)
+            needed_exam_grade = float((desired_grade - so_far_grade))/exam_percentage
+            percent_needed = str(needed_exam_grade*100)
+            if (needed_exam_grade < 0):
+                percent_needed = "literally below 0"
+
+
+            speech_output = "In order to pass the course, " \
+            "you need to get " + percent_needed + " percent on the exam." 
+
+                            
+            reprompt_text = "Tell me the mark you want in the course " \
+            "and  I will guess the grade you need on your exam based on the grade you have going into it."
+
+
+        else:
+            speech_output = "Your command is incomplete. Please try again or ask for help."
+            reprompt_text = "Your command is incomplete. Please try again or ask for help."
+    else:
+        speech_output = "I'm not sure what your question was. " \
+                        "Please try again."
+        reprompt_text = "I'm not sure what your question was. " \
+                        "Please try again."
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
 # --------------- Helpers that build all of the responses ----------------------
 
 
