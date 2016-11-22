@@ -1,0 +1,6 @@
+GradePercentageIntent I am going into the exam with a {current_grade} percent what do I need on the {exam_percentage} percent exam to get {desired_grade} percent in the course
+GradePassIntent I am going into the exam with a {current_grade} percent what do I need on the {exam_percentage} percent exam in order to pass the course
+GradePassIntent I am going into the exam with a eighty percent what do I need on the thirty percent exam to pass the course
+AMAZON.HelpIntent help
+AMAZON.CancelIntent cancel 
+AMAZON.StopIntent stop

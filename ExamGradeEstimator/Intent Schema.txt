@@ -1,0 +1,25 @@
+{
+  "intents": [
+    {"intent": "GradePercentageIntent",
+     "slots":[
+       {"name": "current_grade",
+        "type": "AMAZON.NUMBER"},
+       {"name": "exam_percentage",
+        "type": "AMAZON.NUMBER"},
+       {"name": "desired_grade",
+        "type": "AMAZON.NUMBER"}
+     ]
+    },
+        {"intent": "GradePassIntent",
+     "slots":[
+       {"name": "current_grade",
+        "type": "AMAZON.NUMBER"},
+       {"name": "exam_percentage",
+        "type": "AMAZON.NUMBER"}
+     ]
+    },
+    {"intent": "AMAZON.HelpIntent"},
+    {"intent": "AMAZON.CancelIntent"},
+    {"intent": "AMAZON.StopIntent"}
+     ]
+}
