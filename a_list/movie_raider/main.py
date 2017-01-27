@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_ask import Ask, statement, question, session
 from word_to_numbers import convert_numbers
-from movie_api_comm import *
+from omdb_api_comm import *
+# from movie_api_comm import *
 import sys
 import logging
 import imdb
@@ -22,6 +23,7 @@ ask = Ask(app, "/")
 
 def validate_rating_movie_entities(m):
 	title = get_m_title(m)
+	logger.info("movie received was {0}".format(title))
 	votes = get_m_votes(m)
 	year = get_m_year(m)
 	rating = get_m_rating(m)
@@ -89,9 +91,7 @@ def cast_answer(movie_to_query):
 		if not cast_result:
 			result_string = "Could not find cast for requested movie"
 		else:
-			result_string = "The main actors in " + get_m_title(m) + " from " + get_m_year(m) + " are " + cast_result
-
-			
+			result_string = "The main actors in " + get_m_title(m) + " from " + get_m_year(m) + " are " + cast_result			
 
 	return statement(result_string)
 if __name__ == '__main__':

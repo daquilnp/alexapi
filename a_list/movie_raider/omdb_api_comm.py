@@ -1,4 +1,4 @@
-import imdb
+import omdb
 import json
 import logging
 import traceback
@@ -12,23 +12,19 @@ logger.setLevel(logging.INFO)
 
 def get_movie(movie_to_query, movie_year = ""):
 	try:
-		logger.info("GOING TO IMDb")
-		ia = imdb.IMDb() # by default access the web.
-		logger.info("COMPLETED IMDb STUFF")
+		logger.info("GOING TO OMDb")
+
 		# Search for a movie (get a list of Movie objects).
 		movie_to_query = convert_numbers(movie_to_query)
 		logger.info("movie received was {0}".format(movie_to_query))
 		if not movie_to_query:
 			return 0		
 		# if not movie_year:
-
-		movie_to_query = "{0} {1}".format(movie_to_query, movie_year)
 		
-		s_result = ia.search_movie(movie_to_query)
-		# Print the long imdb canonical title and movieID of the results.
-		m = s_result[0]
+		res = omdb.request(t=movie_to_query[0], y=movie_year)
+		m = json.loads(res.content)
 		logger.info(m)
-		ia.update(m)
+
 		return m
 	except:
 		exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -39,45 +35,44 @@ def get_movie(movie_to_query, movie_year = ""):
 
 def get_m_title(m):
 	try:
-		title = str(m["title"])
+		title = m["Title"]
 	except:
 		title = ""
 	return title	
 
 def get_m_year(m):
 	try:
-		year = str(m["year"])
+		year = m["Year"]
 	except:
 		year = ""
 	return year
 
 def get_m_votes(m):
 	try:
-		votes = str(m["votes"])
+		votes = m["imdbVotes"]
 	except:
 		votes = "an unknown amount of"
 	return votes
 
 def get_m_rating(m):
 	try:
-		rating = str(m["rating"])
+		rating = m["imdbRating"]
 	except:
 		rating = -1
 	return rating
 
 def get_m_cast(m):
 	try:
-		m_cast = m["cast"]
-		cast_range = 5
-		if len(m_cast) < cast_range:
-			cast_range = len(m_cast)
+		m_cast = m["Actors"]
+		m_cast_seperate = m_cast.split(",")
+		cast_range = len(m_cast_seperate)
 		cast_result = ""
 		for i in range(cast_range):
-			actor = m_cast[i]['name']
+			actor = m_cast_seperate[i]
 			if (i == (cast_range - 1)):
-				cast_result = cast_result + "and " + actor
+				cast_result = cast_result + " and" + actor
 			else:
-				cast_result = cast_result + actor + ", "
+				cast_result = cast_result + actor + ","
 		return cast_result
 	except:
 		return ""
