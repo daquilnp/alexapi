@@ -11,6 +11,14 @@ import json
 
 MOVIE_NOT_FOUND_MESSAGE = "The movie requested could not be found"
 
+HELP_MESSAGE = 'Welcome to Movie Raider. This app can currently tell you the i m d b, rating of a movie as well' \
+    	' as the cast of a movie. To ask for the rating of a movie, say "Alexa, ask movie raider the rating for the incredibles".' \
+    	' To ask for the cast of a movie, say "Alexa, ask movie raider the cast of snow dogs". If the movie stats given are not for' \
+    	' the movie you wanted, try again and add the year of the movie at the end. Just say "Alexa, ask movie raider the rating for' \
+    	' taken created in 2008". It should be noted that if numbers are included in the movie name the app will have a more difficult time' \
+    	' finding it. However, sequels to movies such as Iron Man 2 or Iron Man 3 will work perfect. Likewise, movies such as 300 or 101 dalmatians' \
+    	' will also return a correct result.'
+
 logging.basicConfig()
 
 
@@ -33,7 +41,7 @@ def validate_rating_movie_entities(m):
 
 def new_game():
 
-    welcome_msg = render_template('welcome')
+    welcome_msg = render_template(HELP_MESSAGE)
 
     return question(welcome_msg)
 
@@ -51,9 +59,7 @@ def rating_answer(movie_to_query):
 			result_string = "Could not find a movie rating for {0} from {1}".format(m_entities[1], m_entities[2])
 		else:
 		
-			result_string = 'Based on {0} votes, the current I m d b, movie rating for {1} from {2} is {3} on ten'.format(
-																											 m_entities[0],
-																											 m_entities[1], 
+			result_string = '{2} on ten is the current I m d b, movie rating for {0} from {1}'.format(		 m_entities[1], 
 																											 m_entities[2],
 																											 m_entities[3])
 
@@ -70,9 +76,7 @@ def rating_with_year_answer(movie_to_query, movie_year):
 			result_string = "Could not find a movie rating for {0} from {1}".format(m_entities[1], movie_year)
 		else:
 		
-			result_string = 'Based on {0} votes, the current I m d b, movie rating for {1} from {2} is {3} on ten'.format(
-																											 m_entities[0],
-																											 m_entities[1], 
+			result_string = '{2} on ten is the current I m d b, movie rating for {0} from {1}'.format(		 m_entities[1], 
 																											 m_entities[2],
 																											 m_entities[3])
 
@@ -94,6 +98,30 @@ def cast_answer(movie_to_query):
 			result_string = "The main actors in " + get_m_title(m) + " from " + get_m_year(m) + " are " + cast_result			
 
 	return statement(result_string)
+
+@ask.intent("AMAZON.StopIntent")
+def stop():
+	return statement("Stopping. Thank you for using movie raider!")
+
+@ask.intent("AMAZON.CancelIntent")
+def cancel():
+	return statement("Cancelled. Thank you for using movie raider!")
+
+@ask.intent("AMAZON.HelpIntent")
+def help():
+	return statement(HELP_MESSAGE)
+
+@ask.session_ended
+
+def end_of_session():
+	logger.info("Session Ended")
+	return "", 200
+
 if __name__ == '__main__':
 
     app.run(debug=True)
+
+
+
+
+

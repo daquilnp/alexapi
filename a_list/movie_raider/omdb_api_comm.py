@@ -24,6 +24,8 @@ def get_movie(movie_to_query, movie_year = ""):
 		res = omdb.request(t=movie_to_query[0], y=movie_year)
 		m = json.loads(res.content)
 		logger.info(m)
+		if m['Response'] == "False": #could not find movie
+			return 0 
 
 		return m
 	except:
